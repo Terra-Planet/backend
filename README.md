@@ -22,7 +22,7 @@ E.g. payload:
 {    
     "token":"uluna",
     "amount":"1",
-    "src_addr":"terra1y5ryvemxasn5uz7p44nhgdg94r2rmzz5e2k64t",
+    "dst_addr":"terra1y5ryvemxasn5uz7p44nhgdg94r2rmzz5e2k64t",
     "mnemonic":"reject govern sort strategy hunt lunar crunch suspect rain essay maid pill horse main usage term near shock drastic gauge dad belt normal chronic"
 }
 ```
