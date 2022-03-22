@@ -14,7 +14,7 @@ To run:
 **GET** /wallet/balance/<wallet_addr>
 
 
-**POST** /wallet/send
+**POST** /wallet/send[/preview]
 
 E.g. payload:
 
@@ -28,7 +28,7 @@ E.g. payload:
 ```
 
 
-**POST** /wallet/swap
+**POST** /wallet/swap[/preview]
 
 E.g. payload:
 
