@@ -21,7 +21,7 @@ E.g. payload:
 
 ```
 {   
-    "gas" : { "uluna": 0.015 },
+    "fee_token" "uluna",
     "token":"uluna",
     "amount":"1",
     "dst_addr":"terra1y5ryvemxasn5uz7p44nhgdg94r2rmzz5e2k64t",
@@ -36,7 +36,7 @@ E.g. payload:
 
 ```
 {
-    "gas": { "uusd": 0.15 }
+    "fee_token": "uusd",
     "mnemonic": "rough simple snap arrest jazz region people combine abuse coyote use camera second parent mimic smile empower daring guess bacon enlist nose anchor spatial",
     "src":"uluna",
     "amount":"1",
