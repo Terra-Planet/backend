@@ -8,14 +8,23 @@ To run:
 
 ## Endpoints
 
+**GET** /market/rate/<token_in>/<token_out>
+
 **GET** /server/status
 
 **GET** /wallet/create
 
-**GET** /wallet/rate/<token_in>/<token_out>
-
 **GET** /wallet/balance/<wallet_addr>
 
+**POST** /wallet/restore
+
+E.g. payload:
+
+```
+{   
+    "mnemonic":"reject govern sort strategy hunt lunar crunch suspect rain essay maid pill horse main usage term near shock drastic gauge dad belt normal chronic"
+}
+```
 
 **POST** /wallet/send[/preview]
 
