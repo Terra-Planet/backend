@@ -8,6 +8,8 @@ To run:
 
 ## Endpoints
 
+**GET** /server/status
+
 **GET** /wallet/create
 
 **GET** /wallet/rate/<token_in>/<token_out>
