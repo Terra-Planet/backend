@@ -1,23 +1,14 @@
-const { LCDClient, MnemonicKey,MsgSwap,Coin,Fee,MsgSend } = require('@terra-money/terra.js');
-require('isomorphic-fetch');
-const terra = new LCDClient({
-    URL: 'https://bombay-lcd.terra.dev',
-    chainID: 'bombay-12',    
-});
+const { MnemonicKey,MsgSwap,Coin,MsgSend } = require('@terra-money/terra.js');
+
+const utils = require('../lib/utils');
 
 const express = require('express');
 const router = express.Router();
 
-async function get_gas_prices(token) {
-    const gasPrices = await (await fetch('https://bombay-fcd.terra.dev/v1/txs/gas_prices')).json();
-    return {
-        [token]: gasPrices[token]
-    };
-}
 
 router.get('/create', function(req, res) {
     const mk = new MnemonicKey();
-    const wallet = terra.wallet(mk);
+    const wallet = utils.terra.wallet(mk);
 
     res.send({
         'acc_address':wallet.key.accAddress,
@@ -25,18 +16,18 @@ router.get('/create', function(req, res) {
     });
 }); 
 
+router.post('/restore', function(req, res) {
+    
+    const wallet = utils.get_wallet(req.body.mnemonic);
 
-router.get('/rate/:token_in/:token_out', function(req, res) {
-    terra.market.swapRate(new Coin(req.params.token_in,1),req.params.token_out).then ( (r)=> {        
-        res.send({token:r.denom, amount:r.amount});
-    }).catch ( (err) => {
-        res.status(400).send({status:'err',msg:err.message});
+    res.send({
+        'acc_address':wallet.key.accAddress        
     });
 }); 
 
 
 router.get('/balance/:acc_address', async (req, res) =>{
-    terra.bank.balance(req.params.acc_address).then( (balance) => { 
+    utils.terra.bank.balance(req.params.acc_address).then( (balance) => { 
         res.send({native:balance});
     }).catch ( (err) => {
         res.status(400).send({status:'err',msg:err.message});
@@ -45,8 +36,8 @@ router.get('/balance/:acc_address', async (req, res) =>{
 
 
 router.post('/swap', async (req, res) =>{            
-    const mk = new MnemonicKey({mnemonic:req.body.mnemonic});
-    const wallet = terra.wallet(mk);
+
+    const wallet = utils.get_wallet(req.body.mnemonic);
     
     const swap = new MsgSwap(
         wallet.key.accAddress,
@@ -55,9 +46,9 @@ router.post('/swap', async (req, res) =>{
     );
 
 
-    get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
+    utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createAndSignTx({ msgs: [swap], gasPrices: gas_prices}).then ( (tx) => {
-            terra.tx.broadcast(tx).then( (result) => {
+            utils.terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
                     return;
@@ -76,8 +67,8 @@ router.post('/swap', async (req, res) =>{
 
 
 router.post('/swap/preview', async (req, res) =>{            
-    const mk = new MnemonicKey({mnemonic:req.body.mnemonic});
-    const wallet = terra.wallet(mk);
+
+    const wallet = utils.get_wallet(req.body.mnemonic);
     
     const swap = new MsgSwap(
         wallet.key.accAddress,
@@ -85,7 +76,7 @@ router.post('/swap/preview', async (req, res) =>{
         req.body.dst
     );
     
-    get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
+    utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createTx({ msgs: [swap], gasPrices: gas_prices}).then ( (tx) => {    
             res.send(tx);        
         }).catch( (err)=> {
@@ -99,8 +90,8 @@ router.post('/swap/preview', async (req, res) =>{
 
 
 router.post('/send/preview', async (req, res) =>{       
-    const mk = new MnemonicKey({mnemonic:req.body.mnemonic});
-    const wallet = terra.wallet(mk);
+
+    const wallet = utils.get_wallet(req.body.mnemonic);
 
     const send = new MsgSend(
         wallet.key.accAddress,
@@ -108,7 +99,7 @@ router.post('/send/preview', async (req, res) =>{
         { [req.body.token]: req.body.amount * 10 ** 6 }
     );
     
-    get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
+    utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createTx({ msgs: [send], gasPrices: gas_prices  }).then ( (tx) => {
             res.send(tx);
         }).catch ( (err) => {
@@ -121,8 +112,8 @@ router.post('/send/preview', async (req, res) =>{
 
 
 router.post('/send', async (req, res) =>{       
-    const mk = new MnemonicKey({mnemonic:req.body.mnemonic});
-    const wallet = terra.wallet(mk);
+    
+    const wallet = utils.get_wallet(req.body.mnemonic);
     
     const send = new MsgSend(
         wallet.key.accAddress,
@@ -130,9 +121,9 @@ router.post('/send', async (req, res) =>{
         { [req.body.token]: req.body.amount * 10 ** 6 }
     );
     
-    get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
+    utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createAndSignTx({ msgs: [send], gasPrices: gas_prices }).then ( (tx) => {
-            terra.tx.broadcast(tx).then( (result) => {
+            utils.terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
                     return;
