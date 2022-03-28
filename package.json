@@ -11,6 +11,7 @@
   "dependencies": {
     "@anchor-protocol/anchor-earn": "^2.0.0",
     "@terra-money/terra.js": "^3.0.8",
+    "bip39": "^3.0.4",
     "express": "^4.17.3",
     "isomorphic-fetch": "^3.0.0"
   }

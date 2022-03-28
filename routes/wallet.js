@@ -1,5 +1,5 @@
 const { MnemonicKey,MsgSwap,Coin,MsgSend } = require('@terra-money/terra.js');
-
+const { validateMnemonic } = require ('bip39')
 const utils = require('../lib/utils');
 
 const express = require('express');
@@ -18,11 +18,15 @@ router.get('/create', function(req, res) {
 
 router.post('/restore', function(req, res) {
     
-    const wallet = utils.get_wallet(req.body.mnemonic);
+    if(!validateMnemonic(req.body.mnemonic)) {
+        res.status(400).send({status:'invalid_mnemonic'});
+    } else {
+        const wallet = utils.get_wallet(req.body.mnemonic);
 
-    res.send({
-        'acc_address':wallet.key.accAddress        
-    });
+        res.send({
+            'acc_address':wallet.key.accAddress        
+        });
+    }
 }); 
 
 
