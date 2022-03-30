@@ -31,11 +31,16 @@ router.post('/restore', function(req, res) {
 
 
 router.get('/balance/:acc_address', async (req, res) =>{
-    utils.terra.bank.balance(req.params.acc_address).then( (balance) => { 
-        res.send({native:balance});
-    }).catch ( (err) => {
-        res.status(400).send({status:'err',msg:err.message});
-    });    
+
+    if (utils.address_is_valid(req.params.acc_address)) {
+        utils.terra.bank.balance(req.params.acc_address).then( (balance) => { 
+            res.send({native:balance});
+        }).catch ( (err) => {
+            res.status(400).send({status:'err',msg:err.message});
+        });    
+    } else {
+        res.status(400).send({status:'err',msg:'invalid address'});
+    }
 }); 
 
 
@@ -142,6 +147,16 @@ router.post('/send', async (req, res) =>{
     }).catch( (err)=> {
         res.status(400).send({status:'get_gas_prices',msg:err.message});
     });    
+});
+
+
+router.get('/validate_addr/:acc_address', async (req, res) =>{       
+    if (utils.address_is_valid(req.params.acc_address)) {
+        res.send({'valid':true});
+    } else {
+        res.send({'valid':false});
+    }
+    
 });
 
 
