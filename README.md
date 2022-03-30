@@ -16,6 +16,8 @@ To run:
 
 **GET** /wallet/balance/<wallet_addr>
 
+**GET** /wallet/validate_addr/<wallet_addr>
+
 **POST** /wallet/restore
 
 E.g. payload:
