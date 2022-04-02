@@ -32,8 +32,10 @@ router.post('/restore', function(req, res) {
 
 router.get('/balance/:acc_address', async (req, res) =>{
 
+    const terra = utils.get_lcd_client(req.body.network);
+
     if (utils.address_is_valid(req.params.acc_address)) {
-        utils.terra.bank.balance(req.params.acc_address).then( (balance) => { 
+        terra.bank.balance(req.params.acc_address).then( (balance) => { 
             res.send({native:balance});
         }).catch ( (err) => {
             res.status(400).send({status:'err',msg:err.message});
@@ -44,8 +46,9 @@ router.get('/balance/:acc_address', async (req, res) =>{
 }); 
 
 
-router.post('/swap', async (req, res) =>{            
+router.post('/swap', async (req, res) =>{    
 
+    const terra = utils.get_lcd_client(req.body.network);
     const wallet = utils.get_wallet(req.body.mnemonic);
     
     const swap = new MsgSwap(
@@ -57,7 +60,7 @@ router.post('/swap', async (req, res) =>{
 
     utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createAndSignTx({ msgs: [swap], gasPrices: gas_prices}).then ( (tx) => {
-            utils.terra.tx.broadcast(tx).then( (result) => {
+            terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
                     return;
@@ -75,8 +78,9 @@ router.post('/swap', async (req, res) =>{
 });
 
 
-router.post('/swap/preview', async (req, res) =>{            
+router.post('/swap/preview', async (req, res) =>{        
 
+    const terra = utils.get_lcd_client(req.body.network);
     const wallet = utils.get_wallet(req.body.mnemonic);
     
     const swap = new MsgSwap(
@@ -122,6 +126,7 @@ router.post('/send/preview', async (req, res) =>{
 
 router.post('/send', async (req, res) =>{       
     
+    const terra = utils.get_lcd_client(req.body.network);
     const wallet = utils.get_wallet(req.body.mnemonic);
     
     const send = new MsgSend(
@@ -132,7 +137,7 @@ router.post('/send', async (req, res) =>{
     
     utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
         wallet.createAndSignTx({ msgs: [send], gasPrices: gas_prices }).then ( (tx) => {
-            utils.terra.tx.broadcast(tx).then( (result) => {
+            terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
                     return;

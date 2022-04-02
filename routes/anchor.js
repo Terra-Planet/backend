@@ -3,12 +3,19 @@ const express = require('express');
 const router = express.Router();
 
 
+function get_network_id(network) {
+    if (network=='main') {
+        return NETWORKS.COLUMBUS_5;
+    } 
+
+    return NETWORKS.BOMBAY_12;
+}
 
 router.post('/deposit', async (req, res, next) =>{    
-    
+        
     const anchorEarn = new AnchorEarn({
         chain: CHAINS.TERRA,
-        network: NETWORKS.BOMBAY_12,
+        network: get_network_id(req.body.network),
         mnemonic: req.body.mnemonic
       });
     
@@ -28,7 +35,7 @@ router.post('/withdraw', async (req, res, next) =>{
 
     const anchorEarn = new AnchorEarn({
         chain: CHAINS.TERRA,
-        network: NETWORKS.BOMBAY_12,
+        network: get_network_id(req.body.network),
         mnemonic: req.body.mnemonic
       });
     anchorEarn.withdraw({
@@ -47,7 +54,7 @@ router.post('/balance', async (req, res, next) =>{
 
     const anchorEarn = new AnchorEarn({
         chain: CHAINS.TERRA,
-        network: NETWORKS.BOMBAY_12,
+        network: get_network_id(req.body.network),
         mnemonic: req.body.mnemonic
       });
     anchorEarn.balance({
@@ -67,7 +74,7 @@ router.post('/market', async (req, res, next) =>{
 
     const anchorEarn = new AnchorEarn({
         chain: CHAINS.TERRA,
-        network: NETWORKS.BOMBAY_12,
+        network: get_network_id(req.body.network),
         mnemonic: req.body.mnemonic
       });
 
