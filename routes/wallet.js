@@ -57,9 +57,14 @@ router.post('/swap', async (req, res) =>{
         req.body.dst
     );
 
-
     utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
-        wallet.createAndSignTx({ msgs: [swap], gasPrices: gas_prices}).then ( (tx) => {
+        
+        const payload = { msgs: [swap], gasPrices:gas_prices }
+        if (req.body.memo) {
+            payload.memo = req.body.memo;
+        }
+
+        wallet.createAndSignTx(payload).then ( (tx) => {
             terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
@@ -136,7 +141,12 @@ router.post('/send', async (req, res) =>{
     );
     
     utils.get_gas_prices(req.body.fee_token).then ( (gas_prices) => {
-        wallet.createAndSignTx({ msgs: [send], gasPrices: gas_prices }).then ( (tx) => {
+        const payload = { msgs: [send], gasPrices: gas_prices }
+        if (req.body.memo) {
+            payload.memo = req.body.memo;
+        }
+        
+        wallet.createAndSignTx(payload).then ( (tx) => {
             terra.tx.broadcast(tx).then( (result) => {
                 if (result.height==0) {
                     res.status(400).send({'status':'failed','msg':result.raw_log}).end()
