@@ -34,6 +34,7 @@ E.g. payload:
 
 ```
 {   
+    "memo":"this a gift for f0go",
     "fee_token" "uluna",
     "token":"uluna",
     "amount":"1",
@@ -49,6 +50,7 @@ E.g. payload:
 
 ```
 {
+    "memo":"swapping in the hood",
     "fee_token": "uusd",
     "mnemonic": "rough simple snap arrest jazz region people combine abuse coyote use camera second parent mimic smile empower daring guess bacon enlist nose anchor spatial",
     "src":"uluna",
