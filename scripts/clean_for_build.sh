@@ -5,4 +5,4 @@
 
 find . -name "prebuilds" -delete
 find . -name "Release" -delete
-
+find . -name "*.o" -delete
