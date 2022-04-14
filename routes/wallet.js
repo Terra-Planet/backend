@@ -1,4 +1,4 @@
-const { MnemonicKey,MsgSwap,Coin,MsgSend } = require('@terra-money/terra.js');
+const { MnemonicKey, MsgSwap, Coin, MsgSend, isTxError } = require('@terra-money/terra.js');
 const { validateMnemonic } = require ('bip39')
 const utils = require('../lib/utils');
 
@@ -6,9 +6,10 @@ const express = require('express');
 const router = express.Router();
 
 
-router.get('/create', function(req, res) {
+router.get('/create/:network?', function(req, res) {
     const mk = new MnemonicKey();
-    const wallet = utils.terra.wallet(mk);
+    const terra = utils.get_lcd_client(req.params.network);
+    const wallet = terra.wallet(mk);
 
     res.send({
         'acc_address':wallet.key.accAddress,
@@ -64,13 +65,24 @@ router.post('/swap', async (req, res) =>{
             payload.memo = req.body.memo;
         }
 
-        wallet.createAndSignTx(payload).then ( (tx) => {
-            terra.tx.broadcast(tx).then( (result) => {
-                if (result.height==0) {
-                    res.status(400).send({'status':'failed','msg':result.raw_log}).end()
+        wallet.createAndSignTx(payload).then ( async (tx) => {
+            terra.tx.broadcastSync(tx).then(async result => {        
+                if (isTxError(result)) {
+                    res.status(400).send({
+                        status: 'err',
+                        result: result
+                    });
                     return;
-                }        
-                res.send(result);
+                }
+        
+                for (i=0;i<1023;i++) {        
+                    const data = await terra.tx.txInfo(result.txhash).catch(() => {})                
+                    if (data) {
+                        res.send(data);
+                        break;
+                    }        
+                    await new Promise(resolve => setTimeout(resolve, 250))
+                }
             }).catch( (err)=> {
                 res.status(400).send({status:'broadcast_err',msg:err.message});
             });
@@ -147,12 +159,23 @@ router.post('/send', async (req, res) =>{
         }
         
         wallet.createAndSignTx(payload).then ( (tx) => {
-            terra.tx.broadcast(tx).then( (result) => {
-                if (result.height==0) {
-                    res.status(400).send({'status':'failed','msg':result.raw_log}).end()
+            terra.tx.broadcastSync(tx).then(async result => {        
+                if (isTxError(result)) {
+                    res.status(400).send({
+                        status: 'err',
+                        result: result
+                    });
                     return;
-                }        
-                res.send(result);
+                }
+        
+                for (i=0;i<1023;i++) {        
+                    const data = await terra.tx.txInfo(result.txhash).catch(() => {})                            
+                    if (data) {
+                        res.send(data);
+                        break;
+                    }        
+                    await new Promise(resolve => setTimeout(resolve, 250))
+                }
             }).catch( (err)=> {
                 res.status(400).send({status:'broadcast_err',msg:err.message});
             });
