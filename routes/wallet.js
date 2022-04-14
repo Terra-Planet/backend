@@ -31,9 +31,9 @@ router.post('/restore', function(req, res) {
 }); 
 
 
-router.get('/balance/:acc_address', async (req, res) =>{
+router.get('/balance/:acc_address/:network?', async (req, res) =>{
 
-    const terra = utils.get_lcd_client(req.body.network);
+    const terra = utils.get_lcd_client(req.params.network);
 
     if (utils.address_is_valid(req.params.acc_address)) {
         terra.bank.balance(req.params.acc_address).then( (balance) => { 
