@@ -12,7 +12,7 @@ To run:
 
 **GET** /server/status
 
-**GET** /wallet/create
+**GET** /wallet/create/<network?> Optional network parameter, use "main" for production Terra network, if not passed it defaults to testnet.
 
 **GET** /wallet/balance/<wallet_addr>
 
