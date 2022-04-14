@@ -14,7 +14,7 @@ To run:
 
 **GET** /wallet/create/<network?> Optional network parameter, use "main" for production Terra network, if not passed it defaults to testnet.
 
-**GET** /wallet/balance/<wallet_addr>
+**GET** /wallet/balance/<wallet_addr>/<network?> see above.
 
 **GET** /wallet/validate_addr/<wallet_addr>
 
