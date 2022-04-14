@@ -50,7 +50,7 @@ router.get('/balance/:acc_address/:network?', async (req, res) =>{
 router.post('/swap', async (req, res) =>{    
 
     const terra = utils.get_lcd_client(req.body.network);
-    const wallet = utils.get_wallet(req.body.mnemonic);
+    const wallet = utils.get_wallet(req.body.mnemonic, req.body.network);
     
     const swap = new MsgSwap(
         wallet.key.accAddress,
@@ -98,7 +98,7 @@ router.post('/swap', async (req, res) =>{
 router.post('/swap/preview', async (req, res) =>{        
 
     const terra = utils.get_lcd_client(req.body.network);
-    const wallet = utils.get_wallet(req.body.mnemonic);
+    const wallet = utils.get_wallet(req.body.mnemonic, req.body.network);
     
     const swap = new MsgSwap(
         wallet.key.accAddress,
@@ -121,7 +121,7 @@ router.post('/swap/preview', async (req, res) =>{
 
 router.post('/send/preview', async (req, res) =>{       
 
-    const wallet = utils.get_wallet(req.body.mnemonic);
+    const wallet = utils.get_wallet(req.body.mnemonic, req.body.network);
 
     const send = new MsgSend(
         wallet.key.accAddress,
@@ -144,7 +144,7 @@ router.post('/send/preview', async (req, res) =>{
 router.post('/send', async (req, res) =>{       
     
     const terra = utils.get_lcd_client(req.body.network);
-    const wallet = utils.get_wallet(req.body.mnemonic);
+    const wallet = utils.get_wallet(req.body.mnemonic, req.body.network);
     
     const send = new MsgSend(
         wallet.key.accAddress,
