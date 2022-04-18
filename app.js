@@ -1,5 +1,4 @@
 const express = require('express')
-const port = 3000
 const wallet_router = require('./routes/wallet')
 const anchor_router = require('./routes/anchor')
 const server_router = require('./routes/server')
