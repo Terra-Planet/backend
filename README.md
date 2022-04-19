@@ -2,9 +2,10 @@
 
 To run:
 
+```sh
 1. npm install
-2. node ./bin/www 
-
+2. npm start    // runs the app with Basic Auth enabled (user:pass as credentials)
+```
 
 ## Endpoints
 

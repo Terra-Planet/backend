@@ -10,9 +10,18 @@ var http = require('http');
 /**
  * Get port from environment and store in Express.
  */
+const port = normalizePort(process.env.PORT || '4938'); // Changed default port to '4938'
 
-var port = normalizePort(process.env.PORT || '4938'); // Changed default port to '4938'
+/**
+ * Get process arguments
+ */
+const appArgs = process.argv.slice(2);
+const httpUser = appArgs[0] || "";
+const httpPassword = appArgs[1] || "";
+
 app.set('port', port);
+app.set('httpUser', httpUser);
+app.set('httpPassword', httpPassword);
 
 /**
  * Create HTTP server.
@@ -85,5 +94,5 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  //debug('Listening on ' + bind);
+  //console.log('Listening on ' + bind);
 }

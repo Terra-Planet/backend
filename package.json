@@ -2,8 +2,9 @@
   "name": "picopay-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bin/wwww",
   "scripts": {
+    "start": "node ./bin/www user pass",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Hugo Urquiza",
@@ -13,6 +14,7 @@
     "@terra-money/terra.js": "^3.0.8",
     "bip39": "^3.0.4",
     "express": "^4.17.3",
+    "express-basic-auth": "^1.2.1",
     "isomorphic-fetch": "^3.0.0"
   }
 }
