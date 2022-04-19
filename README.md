@@ -2,11 +2,14 @@
 
 To run:
 
+```sh
 1. npm install
-2. node ./bin/www 
-
+2. npm start    // runs the app with Basic Auth enabled (user:pass as credentials)
+```
 
 ## Endpoints
+
+**GET** /health Returns "UP" with status code 200 when service is running. Useful to test authentication and service status.
 
 **GET** /market/rate/<token_in>/<token_out>
 
