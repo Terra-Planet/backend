@@ -6,6 +6,8 @@
 
 var app = require('../app');
 var http = require('http');
+var https = require('https');
+var forge = require('node-forge');
 
 /**
  * Get port from environment and store in Express.
@@ -24,10 +26,26 @@ app.set('httpUser', httpUser);
 app.set('httpPassword', httpPassword);
 
 /**
- * Create HTTP server.
+ * Create HTTP(s) server.
+ * HTTP server is created if auth is disabled
+ * HTTPs server is created if auth is enabled
  */
 
-var server = http.createServer(app);
+var server;
+
+if (httpUser !== undefined && httpPassword !== undefined && httpUser.length > 0 && httpPassword.length > 0) {
+  const pki = forge.pki;
+  const rsa = forge.pki.rsa;
+  const keys = rsa.generateKeyPair(2048);
+  const certificate = createCertificate(keys, port);
+
+  var server = https.createServer({
+    key: pki.privateKeyToPem(keys.privateKey),
+    cert: pki.certificateToPem(certificate),
+  }, app);
+} else {
+  server = http.createServer(app);
+}
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -95,4 +113,88 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   //console.log('Listening on ' + bind);
+}
+
+function createCertificate(keys, port) {
+  const pki = forge.pki;
+  // generate a keypair and create an X.509v3 certificate
+  var cert = pki.createCertificate();
+  cert.publicKey = keys.publicKey;
+
+  cert.serialNumber = '01';
+  cert.validity.notBefore = new Date();
+  cert.validity.notAfter = new Date();
+  cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 10);
+  var attrs = [{
+    name: 'commonName',
+    value: 'localhost'
+  }, {
+    name: 'countryName',
+    value: 'AR'
+  }, {
+    shortName: 'ST',
+    value: 'Rio Negro'
+  }, {
+    name: 'localityName',
+    value: 'San Carlos de Bariloche'
+  }, {
+    name: 'organizationName',
+    value: 'Terra Planet'
+  }, {
+    shortName: 'OU',
+    value: 'Terra Planet'
+  }];
+  cert.setSubject(attrs);
+  // alternatively set subject from a csr
+  //cert.setSubject(csr.subject.attributes);
+  cert.setIssuer(attrs);
+
+  cert.setExtensions([{
+    name: 'authorityKeyIdentifier',
+    keyIdentifier: true,
+    authorityCertIssuer: true,
+    serialNumber: true
+  },
+  {
+    name: 'basicConstraints',
+    cA: true
+  }, {
+    name: 'keyUsage',
+    keyCertSign: true,
+    digitalSignature: true,
+    nonRepudiation: true,
+    keyEncipherment: true,
+    dataEncipherment: true,
+    keyAgreement: true,
+  }, {
+    name: 'extKeyUsage',
+    serverAuth: true,
+    clientAuth: true,
+    codeSigning: true,
+    emailProtection: true,
+    timeStamping: true
+  }, {
+    name: 'nsCertType',
+    client: false,
+    server: true,
+    email: true,
+    objsign: true,
+    sslCA: true,
+    emailCA: true,
+    objCA: true
+  }, {
+    name: 'subjectAltName',
+    altNames: [{
+      type: 6, // URI
+      value: 'localhost:' + port + '/'
+    }, {
+      type: 7, // IP
+      ip: '127.0.0.1'
+    }]
+  }, {
+    name: 'subjectKeyIdentifier'
+  }]);
+  // self-sign certificate
+  cert.sign(keys.privateKey);
+  return cert
 }
