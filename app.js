@@ -32,10 +32,6 @@ app.use(
     })
 );
 
-app.get('/health', (req, res) => {
-    res.send('UP');
-});
-
 app.use('/wallet', wallet_router);
 app.use('/anchor', anchor_router);
 app.use('/server', server_router);
