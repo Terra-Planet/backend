@@ -9,6 +9,8 @@ To run:
 
 ## Endpoints
 
+**GET** /health Returns "UP" with status code 200 when service is running. Useful to test authentication and service status.
+
 **GET** /market/rate/<token_in>/<token_out>
 
 **GET** /server/status
