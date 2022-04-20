@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var http = require('http');
-var https = require('https');
-var forge = require('node-forge');
+const app = require('../app');
+const http = require('http');
+const https = require('https');
+const forge = require('node-forge');
 
 /**
  * Get port from environment and store in Express.
@@ -39,7 +39,7 @@ if (httpUser !== undefined && httpPassword !== undefined && httpUser.length > 0 
   const keys = rsa.generateKeyPair(2048);
   const certificate = createCertificate(keys, port);
 
-  var server = https.createServer({
+  server = https.createServer({
     key: pki.privateKeyToPem(keys.privateKey),
     cert: pki.certificateToPem(certificate),
   }, app);
@@ -84,7 +84,7 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
+  const bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
 
@@ -108,8 +108,8 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
+  const addr = server.address();
+  const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   //console.log('Listening on ' + bind);
@@ -118,14 +118,14 @@ function onListening() {
 function createCertificate(keys, port) {
   const pki = forge.pki;
   // generate a keypair and create an X.509v3 certificate
-  var cert = pki.createCertificate();
+  const cert = pki.createCertificate();
   cert.publicKey = keys.publicKey;
 
   cert.serialNumber = '01';
   cert.validity.notBefore = new Date();
   cert.validity.notAfter = new Date();
   cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 10);
-  var attrs = [{
+  const attrs = [{
     name: 'commonName',
     value: 'localhost'
   }, {
