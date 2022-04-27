@@ -59,8 +59,7 @@ if (httpUser !== undefined && httpPassword !== undefined && httpUser.length > 0 
 server.on('error', onError);
 server.on('listening', onListening);
 
-var serverListening = true;
-server.listen(port);
+var serverListening = false;
 
 if (controlFileHandler) {
   // Accept control messages coming from a file descriptor.
@@ -100,6 +99,9 @@ if (controlFileHandler) {
       console.error(`unknown control command: #${line}#`);
     }
   });
+} else {
+  var serverListening = true;
+  server.listen(port);
 }
 
 /**
