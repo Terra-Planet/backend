@@ -70,22 +70,34 @@ if (controlFileHandler) {
   }));
   rlControl.on('line', (line) => {
     line = line.toString();
-    if (line.match(/^STOP/) && serverListening) {
-      console.error("Node.js Suspending...");
 
-      serverListening = false;
-      server.close();
+    const isStop = line.match(/^STOP/);
+    const isStart = line.match(/^START/);
 
-      console.error("Node.js Suspended.");
-    } else if (line.match(/^START/) && !serverListening) {
-      console.error("Node.js Resuming...");
+    if (isStop) {
+      if (!serverListening) {
+        console.error("Node.js already stopped...");
+      } else {
+        console.error("Node.js Suspending...");
 
-      serverListening = true
-      server.listen(port);
+        serverListening = false;
+        server.close();
 
-      console.error("Node.js Resumed.");
+        console.error("Node.js Suspended.");
+      }
+    } else if (isStart) {
+      if (serverListening) {
+        console.error("Node.js already started...");
+      } else {
+        console.error("Node.js Resuming...");
+
+        serverListening = true
+        server.listen(port);
+
+        console.error("Node.js Resumed.");
+      }
     } else {
-      console.error(`unknown control command: ${line}`);
+      console.error(`unknown control command: #${line}#`);
     }
   });
 }
