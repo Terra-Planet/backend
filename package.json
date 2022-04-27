@@ -4,7 +4,7 @@
   "description": "",
   "main": "bin/wwww",
   "scripts": {
-    "start": "node ./bin/www user pass",
+    "start": "node ./bin/www --user=user --password=pass",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Hugo Urquiza",
@@ -15,7 +15,9 @@
     "bip39": "^3.0.4",
     "express": "^4.17.3",
     "express-basic-auth": "^1.2.1",
+    "fs": "^0.0.1-security",
     "isomorphic-fetch": "^3.0.0",
+    "minimist": "^1.2.6",
     "node-forge": "^1.3.1"
   }
 }
