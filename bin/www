@@ -8,6 +8,8 @@ const app = require('../app');
 const http = require('http');
 const https = require('https');
 const forge = require('node-forge');
+const readline = require('readline');
+const fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -18,8 +20,11 @@ const port = normalizePort(process.env.PORT || '4938'); // Changed default port 
  * Get process arguments
  */
 const appArgs = process.argv.slice(2);
-const httpUser = appArgs[0] || "";
-const httpPassword = appArgs[1] || "";
+const argv = require('minimist')(appArgs);
+
+const httpUser = argv.user || "";
+const httpPassword = argv.password || "";
+var controlFileHandler = argv.controlfh;
 
 app.set('port', port);
 app.set('httpUser', httpUser);
@@ -51,9 +56,39 @@ if (httpUser !== undefined && httpPassword !== undefined && httpUser.length > 0 
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+var serverListening = true;
+server.listen(port);
+
+if (controlFileHandler) {
+  // Accept control messages coming from a file descriptor.
+  controlFileHandler = parseInt(controlFileHandler);
+  let rlControl = readline.createInterface(fs.createReadStream('', {
+    fd: controlFileHandler
+  }));
+  rlControl.on('line', (line) => {
+    line = line.toString();
+    if (line.match(/^STOP/) && serverListening) {
+      console.error("Node.js Suspending...");
+
+      serverListening = false;
+      server.close();
+
+      console.error("Node.js Suspended.");
+    } else if (line.match(/^START/) && !serverListening) {
+      console.error("Node.js Resuming...");
+
+      serverListening = true
+      server.listen(port);
+
+      console.error("Node.js Resumed.");
+    } else {
+      console.error(`unknown control command: ${line}`);
+    }
+  });
+}
 
 /**
  * Normalize a port into a number, string, or false.
@@ -112,7 +147,7 @@ function onListening() {
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  //console.log('Listening on ' + bind);
+  console.log('Listening on ' + bind);
 }
 
 function createCertificate(keys, port) {
@@ -196,5 +231,5 @@ function createCertificate(keys, port) {
   }]);
   // self-sign certificate
   cert.sign(keys.privateKey);
-  return cert
+  return cert;
 }
