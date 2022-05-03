@@ -1,6 +1,7 @@
 const { AnchorEarn,CHAINS, NETWORKS,DENOMS } = require('@anchor-protocol/anchor-earn');
 const express = require('express');
 const router = express.Router();
+require('isomorphic-fetch');
 
 
 function get_network_id(network) {
@@ -72,7 +73,7 @@ router.post('/balance', async (req, res, next) =>{
 
 router.post('/market', async (req, res, next) =>{   
 
-    const anchorEarn = new AnchorEarn({
+/*    const anchorEarn = new AnchorEarn({
         chain: CHAINS.TERRA,
         network: get_network_id(req.body.network),
         mnemonic: req.body.mnemonic
@@ -87,7 +88,10 @@ router.post('/market', async (req, res, next) =>{
     }).catch( (err)=> {
         res.status(400).send({'status':'err','msg':err.message})
     })
-    
+    */
+    const anchor_data = await (await fetch('https://eth-api.anchorprotocol.com/api/v1/stablecoin_info/uusd')).json();
+
+    res.send({APY:anchor_data.current_apy*100})
 });
 
 
